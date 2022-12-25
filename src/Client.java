@@ -46,9 +46,6 @@ public class Client {
 
             StatementAdapter stmt = new MySQLStatement(conn.createStatement());
 
-
-
-
             //stmt.table("actor").insert(c).executeUpdate();
 
             //stmt.table("actor").update(c).where("actor_id='235'").executeUpdate();
