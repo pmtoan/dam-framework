@@ -13,29 +13,13 @@ import java.sql.ResultSet;
  * Description: ...
  */
 public interface StatementAdapter {
+    // Adapter pattern
 
-    public StatementAdapter table(String tableName);
+    public StatementBuilder createStatementBuilder();
 
-    public StatementAdapter where(String ex);
+    public ResultSet executeRawSQLQuery(String sql);
 
-    public StatementAdapter selectAll();
-
-    public StatementAdapter select(String[] cols);
-
-    public StatementAdapter groupBy(String ex);
-
-    public StatementAdapter having(String ex);
-
-    public StatementAdapter insert(Object o);
-
-    public StatementAdapter update(Object o);
-
-    public StatementAdapter delete();
-
-    public ResultSet executeQuery();
-
-    public int executeUpdate();
-
+    public int executeRawSQLUpdate(String sql);
 }
 
 
