@@ -1,4 +1,7 @@
 package ConnectAdapter;
+import Statement.MySQLStatement;
+import Statement.StatementAdapter;
+
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
@@ -9,18 +12,27 @@ import java.sql.SQLException;
  * Description: ...
  */
 public abstract class ConnectionAdapter {
+    // Adapter
+
     public Connection connection ;
-    protected String url;
+    protected String host;
+    protected String port;
+    protected String databaseName;
     protected String userName;
     protected String password;
 
-
     public abstract String getDb();
+
+    public abstract String getDbUrl();
+
+    public abstract StatementAdapter createStatement();
+
+    // Template Method
     public void connect(){
 
         try{
             Class.forName(getDb());
-            this.connection = DriverManager.getConnection(this.url,this.userName,this.password);
+            this.connection = DriverManager.getConnection(getDbUrl(),this.userName,this.password);
         }
         catch (SQLException e)
         {
@@ -32,7 +44,6 @@ public abstract class ConnectionAdapter {
             e.printStackTrace();
         }
     }
-
 
     public void close(){
         if (this.connection!=null){
