@@ -1,10 +1,13 @@
 package Statement;
 
+import AnnotationORM.AnnotationProcessor;
 import Expression.IExpression;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Statement
@@ -13,6 +16,11 @@ import java.util.List;
  * Description: ...
  */
 public class MySQLStatementBuilder extends StatementBuilder {
+
+    public MySQLStatementBuilder(AnnotationProcessor processor){
+         this.processor = processor;
+    }
+
     @Override
     public StatementBuilder selectAll() {
         if(this.selectedColumns != null && !this.selectedColumns.isEmpty()){
@@ -66,24 +74,22 @@ public class MySQLStatementBuilder extends StatementBuilder {
     public StatementBuilder insert(Object o) {
         this.updateType = UPDATE_TYPE.INSERT;
 
-        StringBuilder colName = new StringBuilder("(");
+        StringBuilder colNames = new StringBuilder("(");
         StringBuilder values = new StringBuilder("VALUES (");
 
-        for(Field attribute : o.getClass().getFields()){
-            try {
-                colName.append(attribute.getName()).append(", ");
+        Map<String, Object> res = processor.mapToColumnValue(o);
 
-                values.append("'").append(attribute.get(o)).append("', ");
-
-            } catch (IllegalAccessException e) {
-                e.printStackTrace();
+        for(String colName : res.keySet()){
+            if(res.get(colName) != null && !processor.isPrimaryKey(o, colName)){
+                colNames.append(colName).append(", ");
+                values.append("'").append(res.get(colName)).append("', ");
             }
         }
 
-        colName.setCharAt(colName.length()-2, ')');
+        colNames.setCharAt(colNames.length()-2, ')');
         values.setCharAt( values.length()-2,')');
 
-        this.objectValueParameter = (colName.toString() + values.toString()).trim();
+        this.objectValueParameter = (colNames.toString() + values.toString()).trim();
 
         return this;
     }
@@ -94,15 +100,17 @@ public class MySQLStatementBuilder extends StatementBuilder {
 
         StringBuilder parameter = new StringBuilder("SET ");
 
-        for(Field attribute : o.getClass().getFields()){
-            try {
-                parameter.append(attribute.getName()).append("='").append(attribute.get(o)).append("', ");
+        Map<String, Object> res = processor.mapToColumnValue(o);
 
-            } catch (IllegalAccessException e) {
-                e.printStackTrace();
+        for(String colName : res.keySet()){
+            if(res.get(colName) != null){
+                parameter.append(colName).append("='").append(res.get(colName)).append("', ");
             }
         }
+
         parameter.deleteCharAt(parameter.length() - 2);
+
+        System.out.println(parameter);
 
         this.objectValueParameter = parameter.toString().trim();
 

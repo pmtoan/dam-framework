@@ -1,17 +1,20 @@
+import java.lang.reflect.Field;
 import java.sql.*;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.Date;
 
+import AnnotationORM.Column;
+import AnnotationORM.Table;
 import ConnectAdapter.ConnectionAdapter;
 import ConnectAdapter.MySQLConnection;
 import Expression.Composite.AndExpression;
-import Expression.Composite.OrExpression;
-import Expression.IExpression;
 import Expression.Leaf.*;
 import Statement.StatementAdapter;
 import Statement.StatementBuilder;
-import Statement.MySQLStatementBuilder;
-import Statement.MySQLStatement;
+import Iterator.*;
+import Wrapper.*;
 
 /**
  * PACKAGE_NAME
@@ -34,10 +37,37 @@ public class Client {
         String userName = "root";
         String password = "";
 
-        Actor actor = new Actor("Cris", "Devil Gamer");
+        Actor actor = new Actor("Chris", "Hemsworth");
+        actor.setId(250);
+        actor.setLastUpdate(new Date("2019/2/19"));
+        System.out.println(actor.getLastUpdate());
+
+
+        ORMFactory.setDatabaseInstance(ORMFactory.DATABASE_TYPE.MySQL);
+        ORMFactory.configDatabase(host, port, databaseName, userName, password);
+
+        ORMObject<Actor> actorORMObject = ORMFactory.createORMObject();
+        int rowAffected = 0;
+
+        // Find
+//        Actor rsActor = actorORMObject.findOne(new Equal(actor.firstName, "Cris"));
+//        List<Actor> listActor = actorORMObject.find();
+
+//        if (actorORMObject != null) {
+            rowAffected = actorORMObject.insert(actor);
+//
+//            rowAffected = actorORMObject.update(actor);
+//
+//            rowAffected = actorORMObject.delete(actor);
+//
+//            rowAffected = actorORMObject.delete(new Equal( "actor_id", "194"));
+//        }
+
+        //-----------------------------
 
         ConnectionAdapter connection = new MySQLConnection(host, port, databaseName, userName, password);
-        System.out.println(connection.getDbUrl());
+        //System.out.println(connection.getDbUrl());
+
         connection.connect();
 
         StatementAdapter myStatement = connection.createStatement();
@@ -49,7 +79,7 @@ public class Client {
                 .selectAll()
                 //.where(new Equal("first_name", "Cris"))
                 //.groupBy("first_name")
-                .having(new GreaterOrEqual("actor_id", 210))
+                .having(new GreaterOrEqual("actor_id", 170))
                 .createQueryStatement();
 
         String create = statementBuilder
@@ -72,35 +102,19 @@ public class Client {
 
         //System.out.println("Row affected: " + myStatement.executeRawSQLUpdate(delete));
 
-        System.out.println(query);
+        //System.out.println(query);
         ResultSet rs = myStatement.executeRawSQLQuery(query);
 
-        List<Map<String, Object>> result = new ArrayList<>();
 
+        List<Actor> list = ResultSetMapper.mapResultSetToObject(rs, Actor.class);
 
-        try{
-            while (rs.next()) {
-                Map<String, Object> resMap = new LinkedHashMap<>();
-                for (int i = 1; i <= rs.getMetaData().getColumnCount(); i++) {
-                    resMap.put(rs.getMetaData().getColumnName(i), rs.getObject(i));
-                }
-                result.add(resMap);
-            }
-
-            for(String key : result.get(0).keySet()){
-                System.out.print(key + " | ");
-            }
+        for(Actor a : list){
+            System.out.print(a.id + " - ");
+            System.out.print(a.firstName + " - ");
+            System.out.print(a.lastName + " - ");
+            System.out.print(a.lastUpdate);
             System.out.println();
-            for(Map<String, Object> item : result){
-                for(String key : item.keySet()){
-                    System.out.print(item.get(key) + " | ");
-                }
-                System.out.println();
-            }
-        } catch (SQLException throwables) {
-            throwables.printStackTrace();
         }
-
 
         connection.close();
     }

@@ -1,5 +1,7 @@
 package Statement;
 
+import AnnotationORM.AnnotationProcessor;
+import AnnotationORM.MySqlAnnotationProcessor;
 import Expression.IExpression;
 
 import java.util.List;
@@ -30,10 +32,10 @@ public abstract class StatementBuilder {
     protected String updateStatement;
     protected String queryStatement;
 
+    AnnotationProcessor processor;
+
     public void reset(){
         tableName = null;
-
-
 
         groupByParameter = null;
         havingParameter = null;

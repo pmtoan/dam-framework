@@ -1,5 +1,7 @@
 package Statement;
 
+import AnnotationORM.MySqlAnnotationProcessor;
+
 import java.lang.reflect.Field;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -23,7 +25,7 @@ public class MySQLStatement implements StatementAdapter {
 
     @Override
     public StatementBuilder createStatementBuilder() {
-        return new MySQLStatementBuilder();
+        return new MySQLStatementBuilder(new MySqlAnnotationProcessor());
     }
 
     @Override
