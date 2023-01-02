@@ -1,23 +1,11 @@
 package Statement;
 
-import AnnotationORM.MySqlAnnotationProcessor;
-
-import java.lang.reflect.Field;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 
-/**
- * Statement
- * Create by pmtoan
- * Date 12/11/2022 - 7:56 PM
- * Description: ...
- */
 public class MySQLStatement implements StatementAdapter {
-    private Statement originalStatement;
+    private final Statement originalStatement;
 
     public MySQLStatement(Statement statement){
         this.originalStatement = statement;
@@ -25,7 +13,7 @@ public class MySQLStatement implements StatementAdapter {
 
     @Override
     public StatementBuilder createStatementBuilder() {
-        return new MySQLStatementBuilder(new MySqlAnnotationProcessor());
+        return new MySQLStatementBuilder();
     }
 
     @Override

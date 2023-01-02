@@ -1,17 +1,7 @@
 package Statement;
 
-import AnnotationORM.AnnotationProcessor;
-import AnnotationORM.MySqlAnnotationProcessor;
 import Expression.IExpression;
 
-import java.util.List;
-
-/**
- * Statement
- * Create by pmtoan
- * Date 12/12/2022 - 4:58 PM
- * Description: ...
- */
 public abstract class StatementBuilder {
     // Builder
 
@@ -22,7 +12,7 @@ public abstract class StatementBuilder {
     protected UPDATE_TYPE updateType;
     protected String tableName;
 
-    protected List<String> selectedColumns;
+    protected String selectedColumns;
 
     protected String objectValueParameter;
     protected String groupByParameter;
@@ -32,11 +22,13 @@ public abstract class StatementBuilder {
     protected String updateStatement;
     protected String queryStatement;
 
-    AnnotationProcessor processor;
-
     public void reset(){
+        updateType = null;
         tableName = null;
 
+        selectedColumns = null;
+
+        objectValueParameter = null;
         groupByParameter = null;
         havingParameter = null;
         whereParameter= null;
@@ -46,13 +38,20 @@ public abstract class StatementBuilder {
     }
     
     public StatementBuilder table(String tableName) {
-        this.tableName = tableName;
+        this.tableName = null;
+        if(tableName != null){
+            this.tableName = tableName;
+        }
+
         return this;
     }
 
     public StatementBuilder where(IExpression expression) {
-        this.whereParameter = expression.toString();
-        
+        this.whereParameter = null;
+        if (expression != null) {
+            this.whereParameter = expression.toString();
+        }
+
         return this;
     }
 
@@ -64,7 +63,7 @@ public abstract class StatementBuilder {
         return this;
     }
 
-    public StatementBuilder groupBy(String column) {
+    public StatementBuilder groupBy(String[] cols) {
         return this;
     }
 

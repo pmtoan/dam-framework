@@ -1,4 +1,4 @@
-package ConnectAdapter;
+package Connection;
 
 
 import Statement.MySQLStatement;
@@ -16,12 +16,12 @@ public class MySQLConnection extends ConnectionAdapter {
         this.password = password;
     }
 
-    public String getDb(){
+    protected String getDb(){
         return "com.mysql.cj.jdbc.Driver";
     }
 
     @Override
-    public String getDbUrl() {
+    protected String getDbUrl() {
         return String.format("jdbc:mysql://%s:%s/%s", this.host,this.port,this.databaseName);
     }
 

@@ -1,61 +1,55 @@
 package Statement;
 
-import AnnotationORM.AnnotationProcessor;
+import AnnotationORM.MySqlAnnotationProcessor;
 import Expression.IExpression;
-
-import java.lang.reflect.Field;
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map;
 
-/**
- * Statement
- * Create by pmtoan
- * Date 12/12/2022 - 3:39 PM
- * Description: ...
- */
 public class MySQLStatementBuilder extends StatementBuilder {
 
-    public MySQLStatementBuilder(AnnotationProcessor processor){
-         this.processor = processor;
+    public MySQLStatementBuilder(){
+
     }
 
     @Override
     public StatementBuilder selectAll() {
-        if(this.selectedColumns != null && !this.selectedColumns.isEmpty()){
-            this.selectedColumns.clear();
-        }
-        this.selectedColumns = null;
+        this.selectedColumns = "*";
 
         return this;
     }
 
     @Override
     public StatementBuilder select(String[] cols) {
-        this.selectedColumns = new ArrayList<>();
-        this.selectedColumns.addAll(List.of(cols));
+        this.selectedColumns = null;
+        if(cols != null){
+            this.selectedColumns = getCols(cols);
+        }
 
         return this;
     }
 
     @Override
-    public StatementBuilder groupBy(String column) {
-        this.groupByParameter = column;
+    public StatementBuilder groupBy(String[] cols) {
+        this.groupByParameter = null;
+        if(cols != null){
+            this.groupByParameter = getCols(cols);
+        }
 
         return this;
     }
 
     @Override
     public StatementBuilder having(IExpression expression) {
-        this.havingParameter = expression.toString();
+        this.havingParameter = null;
+        if(expression != null){
+            this.havingParameter = expression.toString();
+        }
 
         return this;
     }
 
     @Override
     public String createQueryStatement() {
-        String sql = "SELECT " + getCols() + " FROM " + tableName + " ";
+        String sql = "SELECT " + selectedColumns + " FROM " + tableName + " ";
 
         if(whereParameter != null){
             sql += "WHERE " + whereParameter + " ";
@@ -67,6 +61,7 @@ public class MySQLStatementBuilder extends StatementBuilder {
             sql += "HAVING " + havingParameter + " ";
         }
 
+        reset();
         return sql + ";";
     }
 
@@ -77,6 +72,7 @@ public class MySQLStatementBuilder extends StatementBuilder {
         StringBuilder colNames = new StringBuilder("(");
         StringBuilder values = new StringBuilder("VALUES (");
 
+        MySqlAnnotationProcessor processor = new MySqlAnnotationProcessor();
         Map<String, Object> res = processor.mapToColumnValue(o);
 
         for(String colName : res.keySet()){
@@ -100,6 +96,7 @@ public class MySQLStatementBuilder extends StatementBuilder {
 
         StringBuilder parameter = new StringBuilder("SET ");
 
+        MySqlAnnotationProcessor processor = new MySqlAnnotationProcessor();
         Map<String, Object> res = processor.mapToColumnValue(o);
 
         for(String colName : res.keySet()){
@@ -109,8 +106,6 @@ public class MySQLStatementBuilder extends StatementBuilder {
         }
 
         parameter.deleteCharAt(parameter.length() - 2);
-
-        System.out.println(parameter);
 
         this.objectValueParameter = parameter.toString().trim();
 
@@ -152,21 +147,18 @@ public class MySQLStatementBuilder extends StatementBuilder {
                 break;
         }
 
+        reset();
         return sql.append(";").toString();
     }
 
-    private String getCols(){
-        String queryCols = "";
+    private String getCols(String[] cols){
+        StringBuilder queryCols = new StringBuilder();
 
-        if(selectedColumns == null){
-            queryCols = "*";
-        } else {
-            for(String col : this.selectedColumns){
-                queryCols += col + ", ";
-            }
-            queryCols = queryCols.substring(0, queryCols.length()-2);
+        for (String col : cols) {
+            queryCols.append(col).append(", ");
         }
+        queryCols.delete(queryCols.length()-2,queryCols.length()-1);
 
-        return queryCols;
+        return queryCols.toString();
     }
 }

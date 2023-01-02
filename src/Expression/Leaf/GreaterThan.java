@@ -2,12 +2,6 @@ package Expression.Leaf;
 
 import java.util.Date;
 
-/**
- * Expression.Leaf
- * Create by pmtoan
- * Date 12/26/2022 - 9:06 PM
- * Description: ...
- */
 public class GreaterThan extends BinaryOperator{
     public GreaterThan(String fieldName, String value) {
         super(fieldName, value);

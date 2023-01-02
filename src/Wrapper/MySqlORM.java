@@ -1,52 +1,68 @@
 package Wrapper;
 
 import AnnotationORM.MySqlAnnotationProcessor;
-import ConnectAdapter.ConnectionAdapter;
-import Expression.Composite.AndExpression;
+import Connection.ConnectionAdapter;
 import Expression.IExpression;
 import Expression.Leaf.Equal;
-import Expression.Leaf.GreaterOrEqual;
-import Iterator.ResultSetMapper;
-import Statement.StatementAdapter;
+import Mapper.ResultSetMapper;
 import Statement.StatementBuilder;
 
-import java.lang.reflect.Field;
 import java.sql.ResultSet;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-/**
- * Wrapper
- * Create by pmtoan
- * Date 12/31/2022 - 2:39 PM
- * Description: ...
- */
 public class MySqlORM<T> extends ORMObject<T>{
-    public MySqlORM(ConnectionAdapter connection) {
-        super(connection);
+    public MySqlORM(ConnectionAdapter connection, Class<T> typeParameterClass) {
+        super(connection, typeParameterClass);
     }
 
     @Override
-    public List<T> find() {
+    public List<T> findAll() {
+        connection.connect();
+        statement = connection.createStatement();
         StatementBuilder statementBuilder = statement.createStatementBuilder();
         String query = statementBuilder.table(tableName)
-                //.select(new String[] {"first_name", "last_name"})
                 .selectAll()
-                //.where(new Equal("first_name", "Cris"))
-                //.groupBy("first_name")
-                //.having(new GreaterOrEqual("actor_id", 210))
                 .createQueryStatement();
         ResultSet rs = statement.executeRawSQLQuery(query);
+        List<T> resultList = ResultSetMapper.mapResultSetToListObject(rs, typeParameterClass);
 
-        return ResultSetMapper.mapResultSetToObject(rs, );
+        connection.close();
+        return resultList;
     }
 
     @Override
-    public T findOne(IExpression condition) {
+    public List<T> find(IExpression where, String[] groupBy, IExpression having) {
+        connection.connect();
+        statement = connection.createStatement();
+        StatementBuilder statementBuilder = statement.createStatementBuilder();
+        String query = statementBuilder.table(tableName)
+                .selectAll()
+                .where(where)
+                .groupBy(groupBy)
+                .having(having)
+                .createQueryStatement();
+        ResultSet rs = statement.executeRawSQLQuery(query);
+        List<T> resultList = ResultSetMapper.mapResultSetToListObject(rs, typeParameterClass);
 
+        connection.close();
+        return resultList;
+    }
 
-        return null;
+    @Override
+    public T findOne(IExpression where) {
+        connection.connect();
+        statement = connection.createStatement();
+        StatementBuilder statementBuilder = statement.createStatementBuilder();
+        String query = statementBuilder.table(tableName)
+                .selectAll()
+                .where(where)
+                .createQueryStatement();
+        ResultSet rs = statement.executeRawSQLQuery(query);
+        T resultObject = ResultSetMapper.mapResultSetToObject(rs, typeParameterClass);
+
+        connection.close();
+        return resultObject;
     }
 
     @Override
@@ -79,8 +95,6 @@ public class MySqlORM<T> extends ORMObject<T>{
                 .update(object)
                 .where(new Equal(primaryKey.getKey(), (int) primaryKey.getValue()))
                 .createUpdateStatement();
-
-        System.out.println(update);
 
         int rs = statement.executeRawSQLUpdate(update);
         connection.close();

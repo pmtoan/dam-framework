@@ -2,12 +2,6 @@ package Expression.Leaf;
 
 import java.util.Date;
 
-/**
- * Expression.Leaf
- * Create by pmtoan
- * Date 12/26/2022 - 9:07 PM
- * Description: ...
- */
 public class LessOrEqual extends BinaryOperator{
     public LessOrEqual(String fieldName, String value) {
         super(fieldName, value);

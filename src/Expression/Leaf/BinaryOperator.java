@@ -4,12 +4,6 @@ import Expression.IExpression;
 
 import java.util.Date;
 
-/**
- * Expression.Leaf
- * Create by pmtoan
- * Date 12/26/2022 - 5:12 PM
- * Description: ...
- */
 public abstract class BinaryOperator implements IExpression {
     protected String fieldName;
     protected String value;

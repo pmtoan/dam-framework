@@ -1,14 +1,8 @@
 package Wrapper;
 
-import ConnectAdapter.ConnectionAdapter;
-import ConnectAdapter.MySQLConnection;
+import Connection.ConnectionAdapter;
+import Connection.MySQLConnection;
 
-/**
- * Wrapper
- * Create by pmtoan
- * Date 12/31/2022 - 12:54 PM
- * Description: ...
- */
 public class ORMFactory {
     public enum DATABASE_TYPE{
         MySQL, MSSQL, MongoDB
@@ -32,11 +26,11 @@ public class ORMFactory {
         dbPassword = password;
     }
 
-    public static <T> ORMObject<T> createORMObject(){
+    public static <T> ORMObject<T> createORMObject(Class<T> typeParameterClass){
         switch (dbType){
             case MySQL:
                 ConnectionAdapter connectionAdapter = new MySQLConnection(dbHost, dbPort, dbDatabaseName, dbUserName, dbPassword);
-                return new MySqlORM<T>(connectionAdapter);
+                return new MySqlORM<T>(connectionAdapter, typeParameterClass);
             case MSSQL:
                 return null;
             case MongoDB:

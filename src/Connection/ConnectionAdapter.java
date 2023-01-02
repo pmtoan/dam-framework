@@ -1,29 +1,23 @@
-package ConnectAdapter;
-import Statement.MySQLStatement;
+package Connection;
 import Statement.StatementAdapter;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
-/**
- * PACKAGE_NAME
- * Create by pmtoan
- * Date 12/5/2022 - 3:25 PM
- * Description: ...
- */
+
 public abstract class ConnectionAdapter {
     // Adapter
 
-    public Connection connection ;
+    protected Connection connection ;
     protected String host;
     protected String port;
     protected String databaseName;
     protected String userName;
     protected String password;
 
-    public abstract String getDb();
+    protected abstract String getDb();
 
-    public abstract String getDbUrl();
+    protected abstract String getDbUrl();
 
     public abstract StatementAdapter createStatement();
 
@@ -57,5 +51,25 @@ public abstract class ConnectionAdapter {
         }
     }
 
+    public boolean isClose(){
+        if (this.connection!=null){
+            try {
+                return connection.isClosed();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+        return true;
+    }
 
+    public boolean isConnect(){
+        if (this.connection!=null){
+            try {
+                return connection.isValid(10);
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+        return true;
+    }
 }

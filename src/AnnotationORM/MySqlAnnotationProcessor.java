@@ -1,16 +1,9 @@
 package AnnotationORM;
 
 import java.lang.reflect.Field;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
-/**
- * AnnotationORM
- * Create by pmtoan
- * Date 12/31/2022 - 3:30 PM
- * Description: ...
- */
 public class MySqlAnnotationProcessor implements AnnotationProcessor{
 
     @Override
